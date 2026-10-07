@@ -183,6 +183,14 @@ fn native_broker_roundtrip() {
     let second_response = fixture.call(&second);
     assert_eq!(second_response["status"], "COMPLETED");
     assert_eq!(fixture.store().verify().unwrap()["count"], 4);
+    assert_eq!(
+        fixture.call_bytes(&[])["errorMessage"],
+        "INPUT-RECORD-INVALID"
+    );
+    assert_eq!(
+        fixture.call_bytes(&NativeRequest::encode(&second).unwrap().bytes()[..100])["errorMessage"],
+        "INPUT-RECORD-INVALID"
+    );
     second["requestId"] = json!(crate::new_id());
     let mut malformed = NativeRequest::encode(&second).unwrap();
     malformed.payload_length = *b"0000000x";
@@ -238,6 +246,25 @@ fn native_broker_roundtrip() {
     );
     ledger["requestId"] = json!(crate::new_id());
     assert_eq!(fixture.call(&ledger)["errorMessage"], "GRAPH_FROZEN");
+    let mut migration = json!({"requestId":crate::new_id(),"traceId":crate::new_id(),"graphId":crate::new_id(),"requestor":"demo-reviewer","type":"MIGRATION-VALIDATE","payload":{"source":source,"modernSource":source,"legacy":{"total":"1.0000"},"modern":{"total":"1.0000"},"equivalence":"EXACT-CANONICAL-JSON-V1"}});
+    assert_eq!(fixture.call(&migration)["status"], "COMPLETED");
+    let (_, saved) = fixture
+        .store()
+        .cached(migration["requestId"].as_str().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(saved["migrationApproved"], false);
+    migration["requestId"] = json!(crate::new_id());
+    migration["payload"]["modern"]["total"] = json!("2.0000");
+    let diverged = fixture.call(&migration);
+    assert_eq!(diverged["status"], "ESCALATED");
+    assert_eq!(diverged["errorMessage"], "MIGRATION_DIVERGENCE");
+    assert!(
+        fixture
+            .store()
+            .frozen(migration["graphId"].as_str().unwrap())
+            .unwrap()
+    );
     let fault_before = fixture.store().verify().unwrap();
     fixture.store().db.execute_batch("CREATE TRIGGER test_fail BEFORE INSERT ON events BEGIN SELECT RAISE(ABORT,'test rollback'); END;").unwrap();
     assert_eq!(
