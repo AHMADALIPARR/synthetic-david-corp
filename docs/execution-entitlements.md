@@ -2,7 +2,7 @@
 
 The [SnapKitty license](../SNAPKITTY%20SOVEREIGN%20COMMERCIAL%20LICENSE) is implemented by `rust/execution-gate`, linked directly into the corporate runtime and Qwen endpoint. REXX only launches fixed native commands.
 
-Protected features are `corporate.validation`, `qwen.responses`, and `codex.launch`. Corporate checks occur before replay/cache lookup and again before completing analysis. Qwen checks every inference request. Native Codex launch checks its feature before spawning. Missing entitlement or unknown signing authority means refusal. Audit inspection, deployment identification, license diagnostics, compilation and tests remain available for administration. The separate COBOL gate still halts without SD-BROKER; any future broker must invoke this verifier before returning authorization. Upstream Codex and LM Studio remain independent third-party programs.
+Protected features are `corporate.validation`, `qwen.responses`, and `codex.launch`. Corporate checks occur before replay/cache lookup and again before completing analysis. Qwen checks every inference request. Native Codex launch checks its feature before spawning. Missing entitlement or unknown signing authority means refusal. Audit inspection, deployment identification, license diagnostics, compilation and tests remain available for administration. The native Linux GnuCOBOL SD_BROKER invokes this verifier before validation or replay and checks the permit again before committing success. The gate halts when the broker is absent. Upstream Codex and LM Studio remain independent third-party programs.
 
 ## Cryptographic contract
 

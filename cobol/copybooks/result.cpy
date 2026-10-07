@@ -1,4 +1,5 @@
        01 SD-RESULT.
+          05 SD-RESULT-ABI        PIC X(8).
           05 SD-RESULT-STATUS    PIC X(16).
           05 SD-EVIDENCE         PIC X(2048).
           05 SD-PROVENANCE-ID    PIC X(36).
@@ -9,5 +10,5 @@
           05 SD-TIMESTAMP        PIC X(27).
           05 SD-UNCERTAINTY      PIC 9V999.
           05 SD-RISK-SIGNAL      PIC 9(4).
-          05 SD-ERROR-CODE       PIC S9(4) COMP.
+          05 SD-ERROR-CODE       PIC 9(4).
           05 SD-ERROR-MESSAGE    PIC X(256).

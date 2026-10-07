@@ -5,6 +5,9 @@ edition.workspace = true
 license-file = "../../SNAPKITTY SOVEREIGN COMMERCIAL LICENSE"
 autotests = false
 
+[lib]
+crate-type = ["rlib", "cdylib"]
+
 [[bin]]
 name = "david"
 path = "src/main.rs"

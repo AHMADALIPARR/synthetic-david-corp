@@ -288,6 +288,111 @@ fn main() {
         std::process::exit(1);
     }
 }
+fn broker_build() -> Result<Value, Box<dyn std::error::Error>> {
+    if !cfg!(target_os = "linux") {
+        return Err("Native broker currently targets Linux GnuCOBOL with an ASCII C ABI".into());
+    }
+    let root = root();
+    fs::create_dir_all(root.join("build"))?;
+    if !root
+        .join("rust/target/debug/libdavid_control_plane.so")
+        .is_file()
+    {
+        return Err("Build the Rust workspace before broker-build".into());
+    }
+    let status = Command::new("cobc")
+        .current_dir(&root)
+        .args([
+            "-std=cobol85",
+            "-fixed",
+            "-I",
+            "cobol/copybooks",
+            "-K",
+            "SD_BROKER",
+            "-x",
+            "-o",
+            "build/broker-runner",
+            "cobol/broker-runner.cbl",
+            "cobol/synthetic-david-corp.cbl",
+            "-L",
+            "rust/target/debug",
+            "-l",
+            "david_control_plane",
+        ])
+        .status()?;
+    if !status.success() {
+        return Err("GnuCOBOL broker compilation failed".into());
+    }
+    Ok(
+        json!({"broker":"build/broker-runner","abi":"SDABI001","target":"Linux GnuCOBOL ASCII C ABI"}),
+    )
+}
+fn cobol_run(args: &[String]) -> Result<Value, Box<dyn std::error::Error>> {
+    if !cfg!(target_os = "linux") {
+        return Err("cobol-run requires the Linux GnuCOBOL broker target".into());
+    }
+    let root = root();
+    let request = read(
+        args.first()
+            .ok_or("Usage: david cobol-run REQUEST [POLICY] [DB]")?,
+    )?;
+    let native = david_control_plane::broker::NativeRequest::encode(&request)?;
+    let policy = fs::canonicalize(
+        args.get(1)
+            .map(PathBuf::from)
+            .unwrap_or(root.join("config/principals.json")),
+    )?;
+    let db = args
+        .get(2)
+        .map(PathBuf::from)
+        .unwrap_or(root.join("data/control-plane.sqlite"));
+    if db.as_os_str() == ":memory:" {
+        return Err("Broker requires a durable database".into());
+    }
+    let db = if db.is_absolute() {
+        db
+    } else {
+        std::env::current_dir()?.join(db)
+    };
+    if let Some(parent) = db.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::create_dir_all(root.join("data"))?;
+    let call = root
+        .join("data")
+        .join(format!("broker-{}", uuid::Uuid::new_v4()));
+    fs::create_dir(&call)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&call, fs::Permissions::from_mode(0o700))?;
+    }
+    let input = call.join("request.bin");
+    let output = call.join("result.bin");
+    fs::write(&input, native.bytes())?;
+    let mut child = Command::new(root.join("build/broker-runner"));
+    child
+        .current_dir(&root)
+        .env("DD_NATIVEIN", &input)
+        .env("DD_NATIVEOUT", &output)
+        .env("DAVID_PRINCIPALS_FILE", policy)
+        .env("DAVID_AUDIT_DB", db)
+        .env("LD_LIBRARY_PATH", root.join("rust/target/debug"));
+    // Resolve caller-selected license paths before changing the child's directory.
+    for name in ["DAVID_ENTITLEMENT_FILE", "DAVID_DEPLOYMENT_KEY_FILE"] {
+        if let Some(path) = std::env::var_os(name) {
+            child.env(name, fs::canonicalize(path)?);
+        }
+    }
+    if !child.status()?.success() {
+        return Err("Native broker runner failed; call records retained in data".into());
+    }
+    let response = david_control_plane::broker::NativeResult::decode_bytes(&fs::read(&output)?)?;
+    fs::remove_file(input)?;
+    fs::remove_file(output)?;
+    fs::remove_dir(call)?;
+    Ok(response)
+}
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     let value = match args.first().map(String::as_str).unwrap_or("help") {
@@ -302,6 +407,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
         "license-status" => david_execution_gate::status("corporate.validation"),
         "deployment-id" => json!({"deploymentSha256":david_execution_gate::deployment_id()?}),
+        "broker-build" => broker_build()?,
+        "cobol-run" => {
+            let response = cobol_run(&args[1..])?;
+            println!("{}", serde_json::to_string_pretty(&response)?);
+            if response["status"] != "COMPLETED" {
+                std::process::exit(1);
+            }
+            return Ok(());
+        }
         "run" => {
             let request = read(
                 args.get(1)
@@ -343,7 +457,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         "codex" => std::process::exit(codex(&args[1..])?),
         "help" => {
             println!(
-                "david version | demo | run REQUEST [POLICY] [DB] | audit [DB] | license-status | deployment-id | qwen-start | qwen-status | qwen-verify | codex [PROMPT] | publication-check"
+                "david version | demo | run REQUEST [POLICY] [DB] | broker-build | cobol-run REQUEST [POLICY] [DB] | audit [DB] | license-status | deployment-id | qwen-start | qwen-status | qwen-verify | codex [PROMPT] | publication-check"
             );
             return Ok(());
         }

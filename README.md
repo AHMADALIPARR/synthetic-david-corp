@@ -34,7 +34,7 @@ The shipped `config/principals.json` is empty: no permissions are granted by def
 
 | Component | Behavior | Status |
 | --- | --- | --- |
-| COBOL control gate and shared copybooks | Validate input, allowlisted dispatch, halt without broker, guard completion | Source; compiler unavailable locally |
+| COBOL control gate and native Rust broker | SDABI001, licensed validation, atomic evidence commit, fail closed | Linux GnuCOBOL integration in CI; compiler unavailable locally |
 | Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document and COBOL inspection | Tested; licensed execution |
 | COBOL AnalysisIR inspector | Explicit layout, raw source hash, declaration candidates and source spans | Runnable Rust structural inspector; no compiler or semantic proof |
 | Rust entitlement gate | Ed25519 paid claims, AES-256-GCM, deployment binding, Windows DPAPI | Tested; production issuer unconfigured |
@@ -62,7 +62,7 @@ cobc -std=cobol85 -fixed -I cobol/copybooks -x -o build/smoke cobol/smoke.cbl co
 build/smoke
 ```
 
-Create `build/` first. The smoke program prints a single PASS marker only after invalid identity and missing-broker rejection both succeed; CI verifies that marker. Strict COBOL-85 returns status through the result area and uses EXIT PROGRAM, without a process RETURN-CODE register. No broker implementation is linked. IBM COBOL II acceptance and binary interoperability must be verified on the target compiler. Do not treat the original JVM sketch, procedure-pointer declarations, or UUID function as verified COBOL-85 features. The ABI must specify compiler, code page, numeric storage and calling convention; copybook names alone do not establish interoperability.
+Create `build/` first. The smoke program prints a single PASS marker only after invalid identity and missing-broker rejection both succeed; CI verifies that marker. Strict COBOL-85 returns status through the result area and uses EXIT PROGRAM, without a process RETURN-CODE register. This missing-broker smoke deliberately links no broker implementation. For the actual Linux GnuCOBOL-to-Rust runtime, build with `david broker-build` and invoke `david cobol-run REQUEST POLICY DB`; see [native broker](docs/cobol-broker.md) for licensing, the byte ABI and integration checks. IBM COBOL II acceptance and binary interoperability must be verified on the target compiler. Do not treat the original JVM sketch, procedure-pointer declarations, or UUID function as verified COBOL-85 features. The ABI must specify compiler, code page, numeric storage and calling convention; copybook names alone do not establish interoperability.
 
 See [architecture](docs/architecture.md), [design corrections](docs/design-review.md), and [delivery roadmap](docs/roadmap.md). The project is hosted privately under the supplied SnapKitty license. The Codex submodule retains its upstream Apache-2.0 license and notices.
 See [Codex/Qwen integration](docs/codex-qwen.md) for the upstream Rust harness, local endpoint, launch commands and transport limits.

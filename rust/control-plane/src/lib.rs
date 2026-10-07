@@ -5,6 +5,7 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 use uuid::Uuid;
+pub mod broker;
 mod cobol_inspection;
 
 pub type Result<T> = std::result::Result<T, String>;
@@ -325,12 +326,15 @@ impl Store {
             )
             .optional()
             .map_err(db_error)?;
-        row.map(|(d, r)| {
-            serde_json::from_str(&r)
-                .map(|r| (d, r))
-                .map_err(|_| "PERSISTENCE_FAILURE".into())
-        })
-        .transpose()
+        row.map(|(digest, raw)| {
+            let response: Value = serde_json::from_str(&raw).map_err(|_| "CACHE_INTEGRITY_INVALID")?;
+            let event: String = self.db.query_row(
+                "SELECT body FROM events WHERE json_extract(body,'$.requestId')=? AND json_extract(body,'$.toolId')='REQUEST-FINALIZE' ORDER BY seq DESC LIMIT 1",
+                [id], |r| r.get(0)).map_err(|_| "CACHE_INTEGRITY_INVALID")?;
+            let event: Value = serde_json::from_str(&event).map_err(|_| "CACHE_INTEGRITY_INVALID")?;
+            ensure(event["inputHash"] == digest && event["outputHash"] == hash(&response), "CACHE_INTEGRITY_INVALID")?;
+            Ok((digest, response))
+        }).transpose()
     }
     pub fn frozen(&self, id: &str) -> Result<bool> {
         Ok(self
@@ -421,6 +425,15 @@ fn execute_inner(
     req: &Value,
     permit: Option<&david_execution_gate::Permit>,
 ) -> Value {
+    execute_checked(store, principals, req, permit, None)
+}
+fn execute_checked(
+    store: &Store,
+    principals: &Value,
+    req: &Value,
+    permit: Option<&david_execution_gate::Permit>,
+    boundary: Option<fn(&Value) -> Result<()>>,
+) -> Value {
     let mut digest = None;
     let mut nodes = Vec::new();
     let mut events = Vec::new();
@@ -461,6 +474,9 @@ fn execute_inner(
             &principal["permissions"],
         )?;
         if let Some((_, response)) = cached {
+            if let Some(check) = boundary {
+                check(&response)?;
+            }
             return Ok(Some(response));
         }
         ensure(
@@ -505,16 +521,33 @@ fn execute_inner(
     } else {
         response["output"] = output;
     }
+    if response["status"] == "COMPLETED" {
+        if let Some(check) = boundary {
+            if let Err(code) = check(&response) {
+                response["status"] = json!("HALTED");
+                response["errorCode"] = json!(code);
+                response.as_object_mut().unwrap().remove("output");
+                response["provenance"] = json!([]);
+                nodes.clear();
+                events.clear();
+            }
+        }
+    }
     if replay
         || digest.is_none()
         || matches!(
             code.as_deref(),
-            Some("REQUEST_ID_CONFLICT" | "AUDIT_CHAIN_INVALID" | "PROVENANCE_INVALID")
+            Some(
+                "REQUEST_ID_CONFLICT"
+                    | "AUDIT_CHAIN_INVALID"
+                    | "PROVENANCE_INVALID"
+                    | "CACHE_INTEGRITY_INVALID"
+            )
         )
     {
         return response;
     }
-    events.push(json!({"eventId":new_id(),"requestId":req["requestId"],"traceId":req["traceId"],"graphId":req["graphId"],"agentId":"SUPERVISOR","toolId":"REQUEST-FINALIZE","timestamp":timestamp(),"result":status,"inputHash":digest,"outputHash":hash(&response),"riskSignal":if status=="COMPLETED" {0} else {1},"errorCode":code}));
+    events.push(json!({"eventId":new_id(),"requestId":req["requestId"],"traceId":req["traceId"],"graphId":req["graphId"],"agentId":"SUPERVISOR","toolId":"REQUEST-FINALIZE","timestamp":timestamp(),"result":response["status"],"inputHash":digest,"outputHash":hash(&response),"riskSignal":if response["status"]=="COMPLETED" {0} else {1},"errorCode":response.get("errorCode").cloned().unwrap_or(Value::Null)}));
     if store
         .commit(req, digest.as_ref().unwrap(), &response, &nodes, &events)
         .is_err()

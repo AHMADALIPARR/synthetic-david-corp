@@ -31,6 +31,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt-get update
       - run: sudo apt-get install -y gnucobol swi-prolog
+      - run: rustup toolchain install 1.99.0 --profile minimal
+      - run: cargo +1.99.0 test --manifest-path rust/Cargo.toml --locked -p david-control-plane native_broker_roundtrip -- --ignored --nocapture
       - run: mkdir -p build
       - run: cobc -std=cobol85 -fixed -I cobol/copybooks -x -o build/smoke cobol/smoke.cbl cobol/synthetic-david-corp.cbl
       - run: build/smoke | tee build/smoke.log
