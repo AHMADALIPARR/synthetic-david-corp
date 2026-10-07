@@ -1,0 +1,9 @@
+[package]
+name = "david-qwen-endpoint"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde_json.workspace = true
+reqwest.workspace = true
+tiny_http.workspace = true

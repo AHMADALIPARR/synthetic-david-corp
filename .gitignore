@@ -1,0 +1,11 @@
+node_modules/
+data/
+build/
+.env
+*.log
+*.db
+*.sqlite*
+.tools/
+rust/target/
+vendor/codex/
+.codex-local/

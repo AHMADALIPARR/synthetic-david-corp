@@ -1,0 +1,34 @@
+{
+  "models": [
+    {
+      "slug": "qwen-local",
+      "display_name": "Local Qwen (LM Studio)",
+      "description": "Owner-configured local Qwen endpoint; no banking execution authority.",
+      "default_reasoning_level": null,
+      "supported_reasoning_levels": [],
+      "supports_reasoning_summaries": false,
+      "supports_reasoning_summary_parameter": false,
+      "default_reasoning_summary": "none",
+      "shell_type": "disabled",
+      "visibility": "list",
+      "supported_in_api": true,
+      "priority": 0,
+      "availability_nux": null,
+      "upgrade": null,
+      "support_verbosity": false,
+      "default_verbosity": null,
+      "apply_patch_tool_type": "freeform",
+      "truncation_policy": { "mode": "tokens", "limit": 4096 },
+      "context_window": 16384,
+      "auto_compact_token_limit": 12000,
+      "experimental_supported_tools": [],
+      "input_modalities": ["text"],
+      "include_skills_usage_instructions": false,
+      "include_plugin_usage_instructions": false,
+      "include_apps_usage_instructions": false,
+      "supports_search_tool": false,
+      "node_repl_disabled": true,
+      "base_instructions": "You are a local Qwen coding assistant. Follow the request and the runtime's permissions. Never invent financial records, execute payments or approve migrations. /no_think"
+    }
+  ]
+}

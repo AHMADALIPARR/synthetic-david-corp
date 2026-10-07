@@ -1,0 +1,21 @@
+{
+  "name": "synthetic-david-corp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.19" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check src/runtime.mjs && node --check src/contracts.mjs && node --check src/store.mjs",
+    "start": "node src/cli.mjs",
+    "demo": "node scripts/demo.mjs",
+    "rust:test": "powershell.exe -NoProfile -File scripts/rust.ps1 test",
+    "rust:build": "powershell.exe -NoProfile -File scripts/rust.ps1 build",
+    "qwen:start": "node scripts/qwen-service.mjs start",
+    "qwen:status": "node scripts/qwen-service.mjs status",
+    "qwen:verify": "node scripts/verify-qwen-endpoint.mjs",
+    "codex:qwen": "node scripts/codex-qwen.mjs",
+    "publication:check": "node scripts/publication-check.mjs",
+    "audit": "node src/cli.mjs audit"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/openai/codex",
+  "revision": "95ec468619386ebb93506ac2091a48e5a558d25c",
+  "directory": "vendor/codex",
+  "license": "Apache-2.0",
+  "modified": false,
+  "rust_provider": "codex-rs/model-provider-info/src/lib.rs",
+  "rust_wire_request": "codex-rs/codex-api/src/endpoint/responses.rs",
+  "rust_wire_events": "codex-rs/codex-api/src/sse/responses.rs",
+  "local_adapter": "rust/qwen-endpoint",
+  "installed_binary_version": "0.159.3"
+}

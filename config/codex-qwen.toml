@@ -1,0 +1,22 @@
+# Isolated Codex configuration. Never copy over the user's active config.
+model = "qwen-local"
+model_provider = "david-qwen"
+model_context_window = 16384
+model_auto_compact_token_limit = 12000
+approval_policy = "on-request"
+sandbox_mode = "read-only"
+web_search = "disabled"
+
+[model_providers.david-qwen]
+name = "Local Qwen through David Rust Responses adapter"
+base_url = "http://127.0.0.1:1235/v1"
+wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
+request_max_retries = 0
+stream_max_retries = 0
+stream_idle_timeout_ms = 120000
+
+[features]
+shell_tool = false
+enable_request_compression = false
