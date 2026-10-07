@@ -10,7 +10,9 @@ flowchart LR
     T --> O[Decision-support response]
 ```
 
-The diagram describes the working reference harness. The COBOL control gate follows the same ordering but requires a native SD-BROKER. Broker responsibilities include authorization, graph state, deterministic sparse routing, source ingestion, foreign adapter dispatch, contract validation, risk aggregation, and atomic evidence/audit writes. The COBOL source halts without this boundary. It does not silently substitute Node execution.
+The diagram describes the working Rust validation harness. The COBOL control gate follows the same ordering but requires a native SD-BROKER. Broker responsibilities include authorization, graph state, deterministic sparse routing, source ingestion, foreign adapter dispatch, contract validation, risk aggregation, and atomic evidence/audit writes. The COBOL source halts without this boundary. The Rust harness is explicitly a separate validation implementation.
+
+Project-owned execution uses COBOL, Rust and Prolog. REXX is the sole script glue and accepts fixed actions only. Codex is launched as a native executable; the Qwen adapter and launcher contain no JavaScript runtime dependency. Rails and Haskell files remain optional integration/design sources from the original language family.
 
 Only three read-only adapters exist. There is no shell execution, HTTP endpoint dispatch, GPU embedding requirement, bank credentials, or LLM dependency. Future vector/model candidates are hints intersected with trusted capabilities and grants. The registry is immutable in-process; unknown agents are rejected, not dropped.
 

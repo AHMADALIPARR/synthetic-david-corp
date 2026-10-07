@@ -20,14 +20,14 @@ LM Studio must serve `qwen-local` with 16,384-token context at `127.0.0.1:1234`.
 On this Windows machine, Rust and GNU compiler tools are installed under ignored `.tools/`. System PATH and IDE configuration were not changed.
 
 ```powershell
-npm.cmd run rust:build
-npm.cmd run rust:test
-npm.cmd run qwen:start
-npm.cmd run qwen:verify
-npm.cmd run codex:qwen -- "Reply with exactly OK. Do not call tools. /no_think"
+& .tools/regina/rexx.exe rexx/david.rexx build
+& .tools/regina/rexx.exe rexx/david.rexx test
+& .tools/regina/rexx.exe rexx/david.rexx qwen-start
+& .tools/regina/rexx.exe rexx/david.rexx qwen-verify
+& .\rust\target\debug\david.exe codex "Reply with exactly OK. Do not call tools. /no_think"
 ```
 
-Without a prompt, `npm.cmd run codex:qwen` opens the interactive CLI. The launcher uses the installed DataGrip Codex package, or a native binary selected by `CODEX_CLI_BIN`. Each child uses `.codex-local`, the local model catalog and compact Qwen instructions. It does not overwrite the user's Codex home, credentials, hooks or active IDE session. Defaults are read-only/on-request, shell tools disabled, web search disabled. This coding harness grants no corporate banking permissions and does not yet expose the corporate validators as Codex tools.
+Without a prompt, `david codex` opens the interactive CLI. The Rust launcher finds the native executable in the installed DataGrip Codex package, or uses a native binary selected by `CODEX_CLI_BIN`. It never invokes the package's JavaScript wrapper. Each child uses `.codex-local`, the local model catalog and compact Qwen instructions. It does not overwrite the user's Codex home, credentials, hooks or active IDE session. Defaults are read-only/on-request, shell tools disabled, web search disabled. This coding harness grants no corporate banking permissions and does not yet expose the corporate validators as Codex tools.
 
 For another machine, install Rust with its platform linker, then:
 
@@ -35,10 +35,10 @@ For another machine, install Rust with its platform linker, then:
 git submodule update --init vendor/codex
 cargo test --manifest-path rust/Cargo.toml --locked
 cargo build --manifest-path rust/Cargo.toml --locked
-node scripts/qwen-service.mjs start
+rust/target/debug/david qwen-start
 ```
 
-The local adapter toolchain is Rust 1.99.0. The upstream source workspace separately requests Rust 1.95.0. The helper `scripts/rust.ps1` resolves this machine's local GNU linker and assembler. w64devkit 2.10.0 supplies the assembler; its archive SHA-256 is `18d0a4c71a166f8401ab6305781bec5882b40b5e06ba9807c61cb5f3b3c6325e`. Compiler downloads and build artifacts are ignored.
+The local adapter toolchain is Rust 1.99.0. The upstream source workspace separately requests Rust 1.95.0. `rexx/david.rexx` resolves this machine's local GNU linker and assembler. w64devkit 2.10.0 supplies the assembler; its archive SHA-256 is `18d0a4c71a166f8401ab6305781bec5882b40b5e06ba9807c61cb5f3b3c6325e`. Regina 3.9.6 is installed under `.tools/regina` from the [official release archive](https://sourceforge.net/projects/regina-rexx/files/regina-rexx/3.9.6/). Compiler downloads and build artifacts are ignored. The REXX launcher accepts one fixed action; file paths and prompts are passed directly to the native CLI.
 
 ## Rust structure and wire mapping
 

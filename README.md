@@ -2,25 +2,25 @@
 
 A repository foundation for the supplied corporate COBOL design. Runtime policy owns permissions and execution. Model suggestions cannot grant authority. No real financial records, transactions, balances, or credentials are included.
 
-**Version 0.1 is a local validation prototype, not a deployed banking system.** COBOL is the primary production target. The runnable Node harness is a reference implementation for testing its contracts and invariants. It does not call the COBOL program and cannot execute payments, post a ledger, or approve migrations.
+**Version 0.1 is a local validation prototype, not a deployed banking system.** COBOL is the primary production target. Rust implements the runnable validation harness, persistent audit store, CLI and Qwen adapter. REXX supplies fixed-action build/launch glue. The harness does not call the COBOL program and cannot execute payments, post a ledger, or approve migrations. No project-owned JavaScript, npm package or PowerShell helper remains.
 
 ## Run on this machine
 
-Node 24.19 or later, Git, and SWI-Prolog are available. There are no npm dependencies.
+Rust, Git, SWI-Prolog and a local Regina REXX interpreter are available. Tool downloads are excluded from Git. Run from the repository root:
 
 ```powershell
 Set-Location C:\Users\NUCMINI\DataGripProjects\default\synthetic-david-corp
-npm.cmd run check
-npm.cmd test
-npm.cmd run demo
+& .tools/regina/rexx.exe rexx/david.rexx build
+& .tools/regina/rexx.exe rexx/david.rexx test
+& .tools/regina/rexx.exe rexx/david.rexx demo
 & 'C:\Program Files\swipl\bin\swipl.exe' -q -s policy/policy_tests.pl -g run_tests -t halt
 ```
 
 For local validation, provide your own JSON request and a local principal policy, then run:
 
 ```powershell
-npm.cmd start -- path/to/request.json path/to/policy.json
-npm.cmd run audit
+& .\rust\target\debug\david.exe run path/to/request.json path/to/policy.json
+& .\rust\target\debug\david.exe audit
 ```
 
 The shipped `config/principals.json` is empty: no permissions are granted by default. The CLI is an owner-operated local tool. `requestor` is an identity assertion by that owner, not network authentication. Do not expose it as a service. See [request contract](docs/contracts.md). SQLite evidence is created under ignored `data/`; treat it as sensitive.
@@ -30,7 +30,8 @@ The shipped `config/principals.json` is empty: no permissions are granted by def
 | Component | Behavior | Status |
 | --- | --- | --- |
 | COBOL control gate and shared copybooks | Validate input, allowlisted dispatch, halt without broker, guard completion | Source; compiler unavailable locally |
-| Node reference harness | Deterministic minimum set, exact journal checks, exact migration comparison, document inspection | Runnable and tested |
+| Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document inspection | Runnable; 16 control tests |
+| REXX launcher | Fixed build/test/run actions; arbitrary commands rejected | Tested on Windows and in CI |
 | SQLite audit/provenance store | Atomic commit, replay checks, graph freezes, restart chain verification | Runnable and tested |
 | Prolog policy | Minimum permitted capability cover; integer balance and exact term checks | Runnable policy tests |
 | DB2 ledger DDL | Accounts, journals, entries, provenance, audit | Target schema; not executed on DB2 |
@@ -40,6 +41,8 @@ The shipped `config/principals.json` is empty: no permissions are granted by def
 | Codex Rust harness + Qwen Responses adapter | Local text/tool wire translation through :1235 | Compiled Rust adapter; native CLI smoke tested |
 
 The implemented agents are LEDGER, MIG-VALID, and DOCUMENT. The broader DAVID role catalog is a roadmap, not a working population of autonomous agents. The local AI stack in the adjacent `claude-backend` repository is not required or modified.
+
+On another machine, install Rust and Regina, then use `rexx rexx/david.rexx build` and `rexx rexx/david.rexx test`, or Cargo directly. No Node runtime is needed. The pinned upstream Codex submodule remains unchanged; its optional SDK/web examples can contain JavaScript, but this integration launches the native Rust executable directly. MCP transport can also be implemented in Rust; a corporate MCP service is not implemented in this version.
 
 ## COBOL build
 

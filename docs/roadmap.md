@@ -1,7 +1,7 @@
 # Delivery roadmap
 
 1. **Local foundation (this version):** tested reference validators, policy, transactional audit/provenance, frozen graphs, native COBOL gate source.
-2. **Native authority:** select IBM/GnuCOBOL target, compile the gate, implement SD-BROKER with explicit ABI, compare Node reference behavior against real COBOL in CI, validate EBCDIC/packed-decimal and overflow semantics.
+2. **Native authority:** select IBM/GnuCOBOL target, implement SD-BROKER with explicit ABI, compare Rust validation behavior against real COBOL in CI, validate EBCDIC/packed-decimal and overflow semantics. The gate already passes strict GnuCOBOL-85 smoke checks in CI.
 3. **Trusted evidence and DB2:** authenticated source ingestion, full provenance DAG, per-currency account checks, complete-journal posting procedure with locks/idempotency/reversal semantics, transaction-bound human authority, restricted DB grants, independent audit anchoring.
 4. **Human review:** authenticated reviewer identities, immutable decisions tied to graph/evidence hashes, scoped freeze and explicit offline/online recovery policy. A model never approves migration.
 5. **Read-only legacy analysis:** COBOL, PL/I, assembler, JCL and DB2 parsers producing a versioned AnalysisIR with source spans and compiler dialect; migration validation over fixtures and selected equivalence rules.

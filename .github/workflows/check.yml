@@ -9,15 +9,11 @@ jobs:
       - run: cargo +1.99.0 fmt --manifest-path rust/Cargo.toml --all -- --check
       - run: cargo +1.99.0 test --manifest-path rust/Cargo.toml --locked
       - run: cargo +1.99.0 build --manifest-path rust/Cargo.toml --locked
-  reference:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - run: npm run check
-      - run: npm test
+      - run: sudo apt-get update && sudo apt-get install -y regina-rexx
+      - run: rexx rexx/david.rexx demo
+      - run: rexx rexx/david.rexx fmt
+      - run: |
+          if rexx rexx/david.rexx arbitrary-command; then exit 1; fi
   native:
     runs-on: ubuntu-latest
     steps:

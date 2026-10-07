@@ -17,6 +17,8 @@ This grants local analysis only. Permissions must never come from the request pa
 
 Each payload supplies `source` with `id`, `location`, and lowercase `sha256`. Source IDs and locations are references supplied by the caller; they are not fetched. Hashes for structured evidence use SHA-256 over UTF-8 canonical JSON: object keys sorted recursively, arrays ordered, no whitespace. Document hashes include JSON string quoting/escaping. Exported raw-file hashes are a different format.
 
+The Rust port retains the existing SQLite tables, triggers, chain layout and string/ordinary-number hashes; it verifies an existing chain before writing. Object keys sort by UTF-16 and floating-point values use ECMAScript formatting for compatibility. Rust additionally preserves signed/unsigned 64-bit JSON integers exactly. Old JavaScript inputs that rounded integers above 2^53 are not equivalent inputs: compare the stored bytes before migration, and always represent financial amounts as decimal strings. A chain that fails verification is refused, never reset automatically. Document character counts retain UTF-16 units for compatibility.
+
 | Type | Payload fields beyond source | Result |
 | --- | --- | --- |
 | LEDGER-VALIDATE | journalId UUID, currency three uppercase letters, entries list | Exact per-journal balance; never posts |
