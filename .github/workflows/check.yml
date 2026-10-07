@@ -15,6 +15,15 @@ jobs:
           grep -Eq 'LICENSE_ISSUER_UNCONFIGURED|LICENSE_ENTITLEMENT_MISSING' license-denial.txt
       - run: rexx rexx/david.rexx fmt
       - run: |
+          rexx rexx/david.rexx version | tee version.txt
+          grep -q '"version": "0.2.0"' version.txt
+          rust/target/debug/david license-status | tee native-license.txt
+          grep -Eq 'LICENSE_ISSUER_UNCONFIGURED|LICENSE_ENTITLEMENT_MISSING' native-license.txt
+          if rust/target/debug/david run examples/cobol-inspect.json examples/cobol-principal.json "$RUNNER_TEMP/david-workflow.sqlite" > native-denial.txt; then exit 1; fi
+          grep -Eq 'LICENSE_ISSUER_UNCONFIGURED|LICENSE_ENTITLEMENT_MISSING' native-denial.txt
+          rust/target/debug/david audit "$RUNNER_TEMP/david-workflow.sqlite" | tee native-audit.txt
+          grep -q '"count": 0' native-audit.txt
+      - run: |
           if rexx rexx/david.rexx arbitrary-command; then exit 1; fi
   native:
     runs-on: ubuntu-latest

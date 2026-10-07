@@ -1,0 +1,6 @@
+{
+  "legacy-reviewer": {
+    "agents": ["COBOL-ANALYZER"],
+    "permissions": ["legacy:cobol:read"]
+  }
+}

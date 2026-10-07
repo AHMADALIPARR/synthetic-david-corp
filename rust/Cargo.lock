@@ -233,7 +233,7 @@ dependencies = [
 
 [[package]]
 name = "david-control-plane"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "david-execution-gate",
@@ -249,7 +249,7 @@ dependencies = [
 
 [[package]]
 name = "david-execution-gate"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "aes-gcm",
  "ed25519-dalek",
@@ -265,7 +265,7 @@ dependencies = [
 
 [[package]]
 name = "david-qwen-endpoint"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "david-execution-gate",
  "reqwest",

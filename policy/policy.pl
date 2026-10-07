@@ -5,6 +5,7 @@
 agent('LEDGER', 'ledger.validate', 'ledger:read', []).
 agent('MIG-VALID', 'migration.validate', 'migration:read', []).
 agent('DOCUMENT', 'document.inspect', 'document:read', []).
+agent('COBOL-ANALYZER', 'legacy.cobol.inspect', 'legacy:cobol:read', []).
 
 minimum_set(Required, Candidates, Permissions, Selected) :-
     ground(Required-Candidates-Permissions),

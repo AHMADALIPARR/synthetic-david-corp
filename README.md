@@ -2,7 +2,7 @@
 
 A repository foundation for the supplied corporate COBOL design. Runtime policy owns permissions and execution. Model suggestions cannot grant authority. No real financial records, transactions, balances, or credentials are included.
 
-**Version 0.1 is a local validation prototype, not a deployed banking system.** COBOL is the primary production target. Rust implements the runnable validation harness, persistent audit store, CLI and Qwen adapter. REXX supplies fixed-action build/launch glue. The harness does not call the COBOL program and cannot execute payments, post a ledger, or approve migrations. No project-owned JavaScript, npm package or PowerShell helper remains.
+**Version 0.2 is a local validation prototype, not a deployed banking system.** COBOL is the primary production target. Rust implements the runnable validation harness, persistent audit store, CLI and Qwen adapter. This increment adds read-only COBOL structural inspection with a versioned AnalysisIR and rechecks current principal permissions before serving cached results. REXX supplies fixed-action build/launch glue. The harness does not call the COBOL program and cannot execute payments, post a ledger, or approve migrations. No project-owned JavaScript, npm package or PowerShell helper remains.
 
 ## Run on this machine
 
@@ -35,7 +35,8 @@ The shipped `config/principals.json` is empty: no permissions are granted by def
 | Component | Behavior | Status |
 | --- | --- | --- |
 | COBOL control gate and shared copybooks | Validate input, allowlisted dispatch, halt without broker, guard completion | Source; compiler unavailable locally |
-| Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document inspection | 17 control tests; licensed execution |
+| Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document and COBOL inspection | Tested; licensed execution |
+| COBOL AnalysisIR inspector | Explicit layout, raw source hash, declaration candidates and source spans | Runnable Rust structural inspector; no compiler or semantic proof |
 | Rust entitlement gate | Ed25519 paid claims, AES-256-GCM, deployment binding, Windows DPAPI | Tested; production issuer unconfigured |
 | REXX launcher | Fixed build/test/run actions; arbitrary commands rejected | Tested on Windows and in CI |
 | SQLite audit/provenance store | Atomic commit, replay checks, graph freezes, restart chain verification | Runnable and tested |
@@ -46,7 +47,9 @@ The shipped `config/principals.json` is empty: no permissions are granted by def
 | Payment/bank/GPU/JVM adapters | No dispatch granted | Unimplemented and disabled |
 | Codex Rust harness + Qwen Responses adapter | Local text/tool wire translation through :1235 | Compiled Rust adapter; native CLI smoke tested |
 
-The implemented agents are LEDGER, MIG-VALID, and DOCUMENT. The broader DAVID role catalog is a roadmap, not a working population of autonomous agents. The local AI stack in the adjacent `claude-backend` repository is not required or modified.
+The implemented agents are LEDGER, MIG-VALID, DOCUMENT, and COBOL-ANALYZER. The broader DAVID role catalog is a roadmap, not a working population of autonomous agents. The local AI stack in the adjacent `claude-backend` repository is not required or modified.
+
+With a genuine paid entitlement provisioned, inspect the labeled development source fixture using `david run examples/cobol-inspect.json examples/cobol-principal.json`. The example principal is opt-in; the shipped production policy remains empty. Repeated identical requests are idempotent. See [AnalysisIR contract and limits](docs/analysis-ir.md). `david version` (or REXX action `version`) reports `0.2.0`.
 
 On another machine, install Rust and Regina, then use `rexx rexx/david.rexx build` and `rexx rexx/david.rexx test`, or Cargo directly. No Node runtime is needed. The pinned upstream Codex submodule remains unchanged; its optional SDK/web examples can contain JavaScript, but this integration launches the native Rust executable directly. MCP transport can also be implemented in Rust; a corporate MCP service is not implemented in this version.
 

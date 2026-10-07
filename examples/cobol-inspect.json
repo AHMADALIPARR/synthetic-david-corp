@@ -1,0 +1,16 @@
+{
+  "requestId": "00000000-0000-0000-0000-000000000101",
+  "traceId": "00000000-0000-0000-0000-000000000102",
+  "graphId": "00000000-0000-0000-0000-000000000103",
+  "requestor": "legacy-reviewer",
+  "type": "COBOL-INSPECT",
+  "payload": {
+    "source": {
+      "id": "DEVELOPMENT-COBOL-FIXTURE",
+      "location": "examples/cobol-inspect.json#payload.text",
+      "sha256": "cd09d85ab74d251427e10da63a3e86c8d2b4c8165d3dc14bca5350fb83efdaba"
+    },
+    "dialect": "COBOL85-FREE",
+    "text": "IDENTIFICATION DIVISION.\nPROGRAM-ID. INSPECT-FIXTURE.\nDATA DIVISION.\nWORKING-STORAGE SECTION.\n01 INPUT-COUNT PIC 9(4).\nPROCEDURE DIVISION.\nMAIN-PARA.\nDISPLAY 'DEVELOPMENT SOURCE FIXTURE'.\nGOBACK.\n"
+  }
+}

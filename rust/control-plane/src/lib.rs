@@ -5,6 +5,7 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 use uuid::Uuid;
+mod cobol_inspection;
 
 pub type Result<T> = std::result::Result<T, String>;
 fn ensure(ok: bool, code: &str) -> Result<()> {
@@ -133,6 +134,7 @@ fn admit(v: &Value) -> Result<()> {
 fn role(agent: &str) -> Option<(&'static str, &'static str, &'static str)> {
     match agent {
         "DOCUMENT" => Some(("document.inspect", "document:read", "DOCUMENT-PARSE")),
+        "COBOL-ANALYZER" => Some(("legacy.cobol.inspect", "legacy:cobol:read", "ANALYZE-COBOL")),
         "LEDGER" => Some(("ledger.validate", "ledger:read", "DOUBLE-ENTRY-VALIDATE")),
         "MIG-VALID" => Some(("migration.validate", "migration:read", "LEGACY-MODERN-DIFF")),
         _ => None,
@@ -182,6 +184,12 @@ pub fn select_minimum(
 }
 fn validate(agent: &str, p: &Value) -> Result<Value> {
     match agent {
+        "COBOL-ANALYZER" => {
+            object(p, &["source", "text", "dialect"])?;
+            source(&p["source"])?;
+            text(&p["text"], 7000)?;
+            cobol_inspection::inspect(p)
+        }
         "DOCUMENT" => {
             object(p, &["source", "text"])?;
             source(&p["source"])?;
@@ -418,6 +426,7 @@ fn execute_inner(
     let mut events = Vec::new();
     let mut selected = Vec::new();
     let mut output = Value::Null;
+    let mut replay = false;
     let outcome: Result<Option<Value>> = (|| {
         if let Some(permit) = permit {
             permit
@@ -427,17 +436,14 @@ fn execute_inner(
         admit(req)?;
         digest = Some(hash(req));
         store.verify()?;
-        if let Some((d, r)) = store.cached(req["requestId"].as_str().unwrap())? {
+        let cached = store.cached(req["requestId"].as_str().unwrap())?;
+        replay = cached.is_some();
+        if let Some((d, _)) = &cached {
             ensure(
                 d == digest.as_ref().unwrap().as_str(),
                 "REQUEST_ID_CONFLICT",
             )?;
-            return Ok(Some(r));
         }
-        ensure(
-            !store.frozen(req["graphId"].as_str().unwrap())?,
-            "GRAPH_FROZEN",
-        )?;
         let principal = principals
             .get(req["requestor"].as_str().unwrap())
             .ok_or("UNKNOWN_REQUESTOR")?;
@@ -445,6 +451,7 @@ fn execute_inner(
         let capability = match req["type"].as_str().unwrap() {
             "LEDGER-VALIDATE" => "ledger.validate",
             "DOCUMENT-INSPECT" => "document.inspect",
+            "COBOL-INSPECT" => "legacy.cobol.inspect",
             "MIGRATION-VALIDATE" => "migration.validate",
             _ => return Err("UNKNOWN_TOOL".into()),
         };
@@ -452,6 +459,13 @@ fn execute_inner(
             &[capability],
             &principal["agents"],
             &principal["permissions"],
+        )?;
+        if let Some((_, response)) = cached {
+            return Ok(Some(response));
+        }
+        ensure(
+            !store.frozen(req["graphId"].as_str().unwrap())?,
+            "GRAPH_FROZEN",
         )?;
         for agent in &selected {
             let value = validate(agent, &req["payload"])?;
@@ -491,7 +505,8 @@ fn execute_inner(
     } else {
         response["output"] = output;
     }
-    if digest.is_none()
+    if replay
+        || digest.is_none()
         || matches!(
             code.as_deref(),
             Some("REQUEST_ID_CONFLICT" | "AUDIT_CHAIN_INVALID" | "PROVENANCE_INVALID")

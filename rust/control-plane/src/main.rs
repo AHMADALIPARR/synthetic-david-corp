@@ -291,6 +291,7 @@ fn main() {
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     let value = match args.first().map(String::as_str).unwrap_or("help") {
+        "version" => json!({"product":"SYNTHETIC-DAVID-CORP","version":env!("CARGO_PKG_VERSION")}),
         "demo" => {
             let response = execute(&Store::open(":memory:")?, &demo_policy(), &demo_request());
             println!("{}", serde_json::to_string_pretty(&response)?);
@@ -342,7 +343,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         "codex" => std::process::exit(codex(&args[1..])?),
         "help" => {
             println!(
-                "david demo | run REQUEST [POLICY] [DB] | audit [DB] | license-status | deployment-id | qwen-start | qwen-status | qwen-verify | codex [PROMPT] | publication-check"
+                "david version | demo | run REQUEST [POLICY] [DB] | audit [DB] | license-status | deployment-id | qwen-start | qwen-status | qwen-verify | codex [PROMPT] | publication-check"
             );
             return Ok(());
         }

@@ -3,6 +3,10 @@
 test(minimum) :- minimum_set(['ledger.validate'], ['DOCUMENT','LEDGER'],
     ['ledger:read','document:read'], ['LEDGER']).
 test(permission, [fail]) :- minimum_set(['ledger.validate'], ['LEDGER'], [], _).
+test(cobol_minimum) :- minimum_set(['legacy.cobol.inspect'], ['DOCUMENT','COBOL-ANALYZER'],
+    ['document:read','legacy:cobol:read'], ['COBOL-ANALYZER']).
+test(cobol_permission, [fail]) :- minimum_set(['legacy.cobol.inspect'], ['COBOL-ANALYZER'],
+    ['document:read'], _).
 test(unknown_agent, [fail]) :- minimum_set(['ledger.validate'], ['UNKNOWN'], ['ledger:read'], _).
 test(exact_balance) :- double_entry_ok(100000, 100000).
 test(no_tolerance, [fail]) :- double_entry_ok(100000, 100001).
