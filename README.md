@@ -38,6 +38,7 @@ The shipped `config/principals.json` is empty: no permissions are granted by def
 | Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document and COBOL inspection | Tested; licensed execution |
 | COBOL AnalysisIR inspector | Explicit layout, raw source hash, declaration candidates and source spans | Runnable Rust structural inspector; no compiler or semantic proof |
 | Rust entitlement gate | Ed25519 paid claims, AES-256-GCM, deployment binding, Windows DPAPI | Tested; production issuer unconfigured |
+| Cloudflare FinOps + MiMo GGUF | Strict DSML read invocation, parallel analytics, optional billing evidence, audited advisory proposals | Rust harness tested; live token and trained MiMo model unconfigured |
 | REXX launcher | Fixed build/test/run actions; arbitrary commands rejected | Tested on Windows and in CI |
 | SQLite audit/provenance store | Atomic commit, replay checks, graph freezes, restart chain verification | Runnable and tested |
 | Prolog policy | Minimum permitted capability cover; integer balance and exact term checks | Runnable policy tests |
@@ -66,3 +67,4 @@ Create `build/` first. The smoke program prints a single PASS marker only after 
 
 See [architecture](docs/architecture.md), [design corrections](docs/design-review.md), and [delivery roadmap](docs/roadmap.md). The project is hosted privately under the supplied SnapKitty license. The Codex submodule retains its upstream Apache-2.0 license and notices.
 See [Codex/Qwen integration](docs/codex-qwen.md) for the upstream Rust harness, local endpoint, launch commands and transport limits.
+See [Cloudflare FinOps](docs/cloudflare-finops.md) for the bespoke MiMo GGUF agent, DSML invocation contract, configuration and metric limits.

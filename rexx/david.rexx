@@ -36,6 +36,8 @@ select
   when action = 'DEMO' then command = 'rust/target/debug/david' || suffix || ' demo'
   when action = 'VERSION' then command = 'rust/target/debug/david' || suffix || ' version'
   when action = 'BROKER-BUILD' then command = 'rust/target/debug/david' || suffix || ' broker-build'
+  when action = 'FINOPS-PLAN' then command = 'rust/target/debug/david-cloudflare-finops' || suffix || ' plan'
+  when action = 'FINOPS-DSML' then command = 'rust/target/debug/david-cloudflare-finops' || suffix || ' dsml-example'
   when action = 'AUDIT' then command = 'rust/target/debug/david' || suffix || ' audit'
   when action = 'LICENSE-STATUS' then command = 'rust/target/debug/david' || suffix || ' license-status'
   when action = 'DEPLOYMENT-ID' then command = 'rust/target/debug/david' || suffix || ' deployment-id'
@@ -44,7 +46,7 @@ select
   when action = 'QWEN-VERIFY' then command = 'rust/target/debug/david' || suffix || ' qwen-verify'
   when action = 'PUBLICATION-CHECK' then command = 'rust/target/debug/david' || suffix || ' publication-check'
   when action = 'HELP' | action = '' then do
-    say 'build test check fmt version broker-build demo audit license-status deployment-id qwen-start qwen-status qwen-verify publication-check'
+    say 'build test check fmt version broker-build finops-plan finops-dsml demo audit license-status deployment-id qwen-start qwen-status qwen-verify publication-check'
     exit 0
   end
   otherwise do

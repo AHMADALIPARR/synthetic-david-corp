@@ -1,0 +1,20 @@
+[package]
+name = "david-cloudflare-finops"
+version.workspace = true
+edition.workspace = true
+license-file = "../../SNAPKITTY SOVEREIGN COMMERCIAL LICENSE"
+
+[dependencies]
+david-execution-gate = { path = "../execution-gate" }
+david-control-plane = { path = "../control-plane" }
+serde_json.workspace = true
+reqwest = { workspace = true, features = ["rustls-tls"] }
+chrono = "0.4"
+rusqlite = { version = "0.37", features = ["bundled"] }
+sha2 = "0.10"
+uuid = { version = "1", features = ["v4"] }
+zeroize = "1"
+
+[[bin]]
+name = "david-cloudflare-finops"
+path = "src/main.rs"

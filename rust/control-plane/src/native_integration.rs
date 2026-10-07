@@ -69,7 +69,12 @@ fn native_broker_roundtrip() {
         .unwrap();
     let root = std::env::temp_dir().join(format!("david-native-{}", crate::new_id()));
     fs::create_dir_all(root.join("rust")).unwrap();
-    for dir in ["control-plane", "execution-gate", "qwen-endpoint"] {
+    for dir in [
+        "control-plane",
+        "execution-gate",
+        "qwen-endpoint",
+        "cloudflare-finops",
+    ] {
         copy_tree(&source.join("rust").join(dir), &root.join("rust").join(dir));
     }
     for file in ["Cargo.toml", "Cargo.lock"] {

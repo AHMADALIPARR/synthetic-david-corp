@@ -15,6 +15,13 @@ jobs:
           grep -Eq 'LICENSE_ISSUER_UNCONFIGURED|LICENSE_ENTITLEMENT_MISSING' license-denial.txt
       - run: rexx rexx/david.rexx fmt
       - run: |
+          rexx rexx/david.rexx finops-plan
+          rexx rexx/david.rexx finops-dsml > "$RUNNER_TEMP/finops.dsml"
+          if rust/target/debug/david-cloudflare-finops invoke "$RUNNER_TEMP/finops.dsml" config/cloudflare-finops.json "$RUNNER_TEMP/finops.sqlite" > "$RUNNER_TEMP/finops-result.txt" 2>&1; then exit 1; fi
+          grep -Eq 'LICENSE_ISSUER_UNCONFIGURED|LICENSE_ENTITLEMENT_MISSING' "$RUNNER_TEMP/finops-result.txt"
+          rust/target/debug/david-cloudflare-finops audit "$RUNNER_TEMP/finops.sqlite" | tee "$RUNNER_TEMP/finops-audit.txt"
+          grep -q '"count": 0' "$RUNNER_TEMP/finops-audit.txt"
+      - run: |
           rexx rexx/david.rexx version | tee version.txt
           grep -q '"version": "0.2.0"' version.txt
           rust/target/debug/david license-status | tee native-license.txt

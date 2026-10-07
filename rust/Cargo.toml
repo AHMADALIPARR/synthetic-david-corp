@@ -1,5 +1,5 @@
 [workspace]
-members = ["qwen-endpoint", "control-plane", "execution-gate"]
+members = ["qwen-endpoint", "control-plane", "execution-gate", "cloudflare-finops"]
 resolver = "2"
 
 [workspace.package]
