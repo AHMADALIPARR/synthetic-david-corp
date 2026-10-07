@@ -1,0 +1,107 @@
+SNAPKITTY SOVEREIGN COMMERCIAL LICENSE
+
+Version 1.0
+
+Copyright © SnapKitty Collective and applicable copyright holders. All rights reserved.
+
+1. PROPRIETARY SOFTWARE
+
+The SnapKitty software, source code, object code, binaries, models, weights, firmware, documentation, interfaces, protocols, cryptographic materials, updates, and associated components (“Software”) are proprietary works.
+
+Except for the limited rights expressly granted by this License, no right, title, ownership interest, copyright, patent right, trade-secret right, or other intellectual-property right is transferred to Licensee.
+
+2. CONDITIONAL LICENSE GRANT
+
+Subject to Licensee’s acceptance of this License, payment of all applicable license fees, and continued possession of a valid cryptographically verifiable SnapKitty Execution Entitlement, Licensor grants Licensee a limited, revocable, non-exclusive, non-transferable, non-sublicensable right to execute the Software solely within the scope stated in the applicable Order, entitlement, or commercial agreement.
+
+Possession of the Software does not itself confer authorization to execute the Software.
+
+3. EXECUTION ENTITLEMENT
+
+Execution of the Software requires a valid SnapKitty Execution Entitlement issued or cryptographically authorized by Licensor.
+
+An Execution Entitlement may specify:
+
+* Licensee identity;
+* organization;
+* authorized products and components;
+* authorized machines, processors, nodes, clusters, or environments;
+* permitted features;
+* deployment limits;
+* concurrency limits;
+* effective date;
+* expiration date;
+* subscription or maintenance status; and
+* other commercially agreed restrictions.
+
+The Software may refuse initialization, execution, privileged operations, protected modules, or continued licensed operation when a required entitlement is absent, invalid, expired, revoked pursuant to the applicable agreement, outside its authorized scope, or cryptographically unverifiable.
+
+4. PAYMENT CONDITION
+
+Payment is a material condition of the commercial license grant.
+
+Unless an applicable signed Order provides otherwise, no commercial execution rights are granted for a period for which required license fees have not been paid.
+
+Where the applicable commercial agreement provides for subscription, recurring, usage-based, term, node, seat, enterprise, or other continuing fees, the corresponding execution rights exist only for the paid and authorized scope.
+
+Failure to pay does not transfer ownership of the Software and does not create a perpetual license.
+
+Any suspension or termination for nonpayment shall occur only as permitted by the applicable agreement and applicable law.
+
+5. CRYPTOGRAPHIC ENFORCEMENT
+
+Licensee acknowledges that the Software may use cryptographic signatures, machine or deployment binding, signed entitlement manifests, integrity verification, secure counters, hardware-backed identity, or other technical measures to determine whether execution is authorized.
+
+Licensee receives no ownership interest in any private signing key, licensing root key, entitlement-generation system, or other credential used by Licensor to authorize execution.
+
+6. NO CIRCUMVENTION
+
+Except to the extent a restriction is prohibited by applicable law, Licensee shall not intentionally:
+
+(a) forge, alter, counterfeit, clone, replay, or fabricate an Execution Entitlement;
+
+(b) bypass or disable licensing or entitlement verification for the purpose of obtaining execution beyond the licensed scope;
+
+(c) extract or misuse Licensor’s private signing keys or entitlement-generation credentials;
+
+(d) represent an unauthorized deployment as an authorized deployment; or
+
+(e) knowingly enable another party to exercise rights exceeding those purchased from Licensor.
+
+Nothing in this License prohibits activities that applicable law expressly permits notwithstanding contractual restrictions.
+
+7. SOURCE AVAILABILITY DOES NOT EQUAL LICENSE GRANT
+
+Access to source code does not make the Software open source and does not grant unrestricted rights to use, execute, reproduce, modify, distribute, sublicense, host, commercialize, or create derivative commercial products.
+
+Any source access is governed exclusively by the rights expressly granted under this License or a separately executed agreement.
+
+8. NO IMPLIED RIGHTS
+
+No rights arise through possession, access, disclosure, publication, repository access, prior use, interoperability, evaluation, or technical ability to execute the Software.
+
+All rights not expressly granted are reserved.
+
+9. COMMERCIAL DEPLOYMENT
+
+Production, enterprise, hosted, embedded, OEM, redistribution, service-provider, managed-service, cloud, appliance, cluster, or revenue-generating deployment requires the corresponding commercial entitlement issued by Licensor.
+
+10. TERMINATION
+
+The license terminates upon expiration of the licensed term or may be terminated for material breach according to the applicable commercial agreement and applicable law.
+
+Upon termination, Licensee must cease exercises of rights no longer licensed.
+
+Termination does not transfer ownership of the Software to Licensee.
+
+11. ORDERS AND ENTERPRISE AGREEMENTS
+
+Pricing, payment schedules, license duration, deployment quantities, support obligations, service levels, cure periods, renewal provisions, and other customer-specific commercial terms may be established in an Order Form, Enterprise License Agreement, OEM Agreement, or other written agreement.
+
+If an executed agreement expressly conflicts with this License, that agreement controls to the extent of the conflict.
+
+12. RESERVATION OF RIGHTS
+
+The Software is licensed, not sold, except where applicable law requires otherwise.
+
+Licensor reserves every right not expressly granted under this License.
