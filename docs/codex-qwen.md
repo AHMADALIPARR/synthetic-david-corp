@@ -15,6 +15,8 @@ flowchart LR
 
 ## Start
 
+The David launcher now requires `codex.launch`, and each adapter inference requires `qwen.responses` in a paid execution entitlement. Provision the pinned signing authority and deployment grant as described in [execution entitlements](execution-entitlements.md) before running the commands below. A fresh checkout denies inference. `/health` reports the current licensing state without calling the model. These gates apply to the David integration; they do not modify the upstream native Codex program or LM Studio.
+
 LM Studio must serve `qwen-local` with 16,384-token context at `127.0.0.1:1234`. No OpenAI API key is needed. If local server authentication is enabled, supply `LM_STUDIO_API_KEY` through the process environment.
 
 On this Windows machine, Rust and GNU compiler tools are installed under ignored `.tools/`. System PATH and IDE configuration were not changed.

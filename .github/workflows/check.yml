@@ -10,7 +10,9 @@ jobs:
       - run: cargo +1.99.0 test --manifest-path rust/Cargo.toml --locked
       - run: cargo +1.99.0 build --manifest-path rust/Cargo.toml --locked
       - run: sudo apt-get update && sudo apt-get install -y regina-rexx
-      - run: rexx rexx/david.rexx demo
+      - run: |
+          if rexx rexx/david.rexx demo > license-denial.txt; then exit 1; fi
+          grep -Eq 'LICENSE_ISSUER_UNCONFIGURED|LICENSE_ENTITLEMENT_MISSING' license-denial.txt
       - run: rexx rexx/david.rexx fmt
       - run: |
           if rexx rexx/david.rexx arbitrary-command; then exit 1; fi

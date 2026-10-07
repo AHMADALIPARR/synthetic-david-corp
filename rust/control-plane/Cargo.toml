@@ -2,12 +2,15 @@
 name = "david-control-plane"
 version.workspace = true
 edition.workspace = true
+license-file = "../../SNAPKITTY SOVEREIGN COMMERCIAL LICENSE"
+autotests = false
 
 [[bin]]
 name = "david"
 path = "src/main.rs"
 
 [dependencies]
+david-execution-gate = { path = "../execution-gate" }
 serde_json.workspace = true
 reqwest.workspace = true
 rusqlite = { version = "0.37", features = ["bundled"] }
@@ -16,3 +19,6 @@ regex = "1"
 uuid = { version = "1", features = ["v4"] }
 chrono = "0.4"
 ryu-js = "1"
+
+[dev-dependencies]
+ed25519-dalek = "2"

@@ -1,0 +1,19 @@
+[package]
+name = "david-execution-gate"
+version.workspace = true
+edition.workspace = true
+license-file = "../../SNAPKITTY SOVEREIGN COMMERCIAL LICENSE"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json.workspace = true
+aes-gcm = "0.10"
+ed25519-dalek = "2"
+sha2 = "0.10"
+hex = "0.4"
+zeroize = "1"
+getrandom = "0.4"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+windows-sys = { version = "0.61", features = ["Win32_Security_Cryptography", "Win32_System_Memory", "Win32_Foundation"] }

@@ -2,8 +2,10 @@
 name = "david-qwen-endpoint"
 version.workspace = true
 edition.workspace = true
+license-file = "../../SNAPKITTY SOVEREIGN COMMERCIAL LICENSE"
 
 [dependencies]
+david-execution-gate = { path = "../execution-gate" }
 serde_json.workspace = true
 reqwest.workspace = true
 tiny_http.workspace = true

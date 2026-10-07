@@ -1,5 +1,5 @@
 [workspace]
-members = ["qwen-endpoint", "control-plane"]
+members = ["qwen-endpoint", "control-plane", "execution-gate"]
 resolver = "2"
 
 [workspace.package]

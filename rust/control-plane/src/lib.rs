@@ -399,12 +399,31 @@ pub fn new_id() -> String {
     Uuid::new_v4().to_string()
 }
 pub fn execute(store: &Store, principals: &Value, req: &Value) -> Value {
+    let permit = match david_execution_gate::authorize("corporate.validation") {
+        Ok(permit) => permit,
+        Err(code) => {
+            return json!({"status":"HALTED","errorCode":code,"decisionSupportOnly":true,"paymentExecuted":false,"migrationApproved":false});
+        }
+    };
+    execute_inner(store, principals, req, Some(&permit))
+}
+fn execute_inner(
+    store: &Store,
+    principals: &Value,
+    req: &Value,
+    permit: Option<&david_execution_gate::Permit>,
+) -> Value {
     let mut digest = None;
     let mut nodes = Vec::new();
     let mut events = Vec::new();
     let mut selected = Vec::new();
     let mut output = Value::Null;
     let outcome: Result<Option<Value>> = (|| {
+        if let Some(permit) = permit {
+            permit
+                .require("corporate.validation", david_execution_gate::now()?)
+                .map_err(str::to_owned)?;
+        }
         admit(req)?;
         digest = Some(hash(req));
         store.verify()?;
@@ -447,6 +466,11 @@ pub fn execute(store: &Store, principals: &Value, req: &Value) -> Value {
             nodes.push(node);
             output = value;
         }
+        if let Some(permit) = permit {
+            permit
+                .require("corporate.validation", david_execution_gate::now()?)
+                .map_err(str::to_owned)?;
+        }
         Ok(None)
     })();
     if let Ok(Some(cached)) = outcome {
@@ -459,6 +483,9 @@ pub fn execute(store: &Store, principals: &Value, req: &Value) -> Value {
         _ => "HALTED",
     };
     let mut response = json!({"status":status,"agents":selected,"provenance":nodes,"decisionSupportOnly":true,"executionAuthority":"RUST-VALIDATION-HARNESS","paymentExecuted":false,"migrationApproved":false});
+    if let Some(permit) = permit {
+        response["executionEntitlement"] = permit.summary();
+    }
     if let Some(c) = &code {
         response["errorCode"] = json!(c);
     } else {
@@ -488,3 +515,7 @@ pub fn demo_request() -> Value {
 pub fn demo_policy() -> Value {
     json!({"demo-reviewer":{"agents":["DOCUMENT"],"permissions":["document:read"]}})
 }
+
+#[cfg(test)]
+#[path = "../tests/controls.rs"]
+mod controls;

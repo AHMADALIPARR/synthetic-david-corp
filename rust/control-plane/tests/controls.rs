@@ -1,5 +1,78 @@
-use david_control_plane::*;
+use crate::*;
 use serde_json::{Value, json};
+// Test-only access to the deterministic core. Production exposes only gated execute.
+fn execute(store: &Store, policy: &Value, request: &Value) -> Value {
+    crate::execute_inner(store, policy, request, None)
+}
+#[test]
+fn licensing_blocks_cache_replay_and_creates_no_audit_on_denial() {
+    let s = store();
+    let request = ledger();
+    execute(&s, &policy(), &request);
+    let before = s.verify().unwrap();
+    if david_execution_gate::issuer_root().is_err() {
+        error(
+            &crate::execute(&s, &policy(), &request),
+            "LICENSE_ISSUER_UNCONFIGURED",
+        );
+        assert_eq!(s.verify().unwrap(), before);
+    }
+    let time = david_execution_gate::now().unwrap();
+    let claims = david_execution_gate::Claims {
+        version: 1,
+        entitlement_id: "EXPIRED-DEVELOPMENT-FIXTURE".into(),
+        licensee: "TEST-ONLY".into(),
+        product: david_execution_gate::PRODUCT.into(),
+        deployment_sha256: "a".repeat(64),
+        features: vec!["corporate.validation".into()],
+        issued_at: time - 1000,
+        not_before: time - 1000,
+        expires_at: time - 100,
+        payment: david_execution_gate::Payment {
+            status: "SETTLED".into(),
+            receipt_id: "TEST-ONLY-NOT-A-PAYMENT".into(),
+            evidence_sha256: "b".repeat(64),
+            paid_from: time - 1000,
+            paid_through: time - 100,
+        },
+    };
+    let mut active = claims.clone();
+    active.expires_at = time + 500;
+    active.payment.paid_through = time + 500;
+    let signed = david_execution_gate::sign(claims, &[9; 32], time - 500).unwrap();
+    // Public key of the explicit test seed; no production signing authority.
+    let issuer = ed25519_dalek::SigningKey::from_bytes(&[9; 32])
+        .verifying_key()
+        .to_bytes();
+    let sealed =
+        david_execution_gate::seal(&signed, &[7; 32], &issuer, &"a".repeat(64), time - 500)
+            .unwrap();
+    let permit =
+        david_execution_gate::verify(&sealed, &[7; 32], &issuer, &"a".repeat(64), time - 500)
+            .unwrap();
+    error(
+        &crate::execute_inner(&s, &policy(), &request, Some(&permit)),
+        "LICENSE_EXPIRED",
+    );
+    assert_eq!(s.verify().unwrap(), before);
+    let signed = david_execution_gate::sign(active, &[9; 32], time).unwrap();
+    let sealed =
+        david_execution_gate::seal(&signed, &[7; 32], &issuer, &"a".repeat(64), time).unwrap();
+    let permit =
+        david_execution_gate::verify(&sealed, &[7; 32], &issuer, &"a".repeat(64), time).unwrap();
+    let mut fresh = ledger();
+    let result = crate::execute_inner(&s, &policy(), &fresh, Some(&permit));
+    assert_eq!(result["status"], "COMPLETED");
+    assert_eq!(result["executionEntitlement"]["authorized"], true);
+    assert_eq!(s.verify().unwrap()["count"], 4);
+    let mut denied = policy();
+    denied["reviewer"]["permissions"] = json!([]);
+    fresh["requestId"] = json!(new_id());
+    error(
+        &crate::execute_inner(&s, &denied, &fresh, Some(&permit)),
+        "MISSING_PERMISSION",
+    );
+}
 fn policy() -> Value {
     json!({"reviewer":{"agents":["LEDGER","DOCUMENT","MIG-VALID"],"permissions":["ledger:read","document:read","migration:read"]}})
 }

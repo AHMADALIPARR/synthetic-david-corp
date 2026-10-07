@@ -35,12 +35,14 @@ select
   when action = 'FMT' then command = 'cargo fmt --manifest-path rust/Cargo.toml --all -- --check'
   when action = 'DEMO' then command = 'rust/target/debug/david' || suffix || ' demo'
   when action = 'AUDIT' then command = 'rust/target/debug/david' || suffix || ' audit'
+  when action = 'LICENSE-STATUS' then command = 'rust/target/debug/david' || suffix || ' license-status'
+  when action = 'DEPLOYMENT-ID' then command = 'rust/target/debug/david' || suffix || ' deployment-id'
   when action = 'QWEN-START' then command = 'rust/target/debug/david' || suffix || ' qwen-start'
   when action = 'QWEN-STATUS' then command = 'rust/target/debug/david' || suffix || ' qwen-status'
   when action = 'QWEN-VERIFY' then command = 'rust/target/debug/david' || suffix || ' qwen-verify'
   when action = 'PUBLICATION-CHECK' then command = 'rust/target/debug/david' || suffix || ' publication-check'
   when action = 'HELP' | action = '' then do
-    say 'build test check fmt demo audit qwen-start qwen-status qwen-verify publication-check'
+    say 'build test check fmt demo audit license-status deployment-id qwen-start qwen-status qwen-verify publication-check'
     exit 0
   end
   otherwise do

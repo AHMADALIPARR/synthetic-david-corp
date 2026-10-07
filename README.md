@@ -6,12 +6,15 @@ A repository foundation for the supplied corporate COBOL design. Runtime policy 
 
 ## Run on this machine
 
+Execution is subject to the [SnapKitty Sovereign Commercial License](SNAPKITTY%20SOVEREIGN%20COMMERCIAL%20LICENSE). An embedded Rust gate requires an issuer-signed, paid, deployment-bound entitlement sealed with AES-256-GCM. The public signing root is deliberately unconfigured; protected commands refuse execution until authority and a genuine entitlement are provisioned. See [provisioning and limits](docs/execution-entitlements.md). This controls license-fee access; it does not execute bank payments.
+
 Rust, Git, SWI-Prolog and a local Regina REXX interpreter are available. Tool downloads are excluded from Git. Run from the repository root:
 
 ```powershell
 Set-Location C:\Users\NUCMINI\DataGripProjects\default\synthetic-david-corp
 & .tools/regina/rexx.exe rexx/david.rexx build
 & .tools/regina/rexx.exe rexx/david.rexx test
+& .tools/regina/rexx.exe rexx/david.rexx license-status
 & .tools/regina/rexx.exe rexx/david.rexx demo
 & 'C:\Program Files\swipl\bin\swipl.exe' -q -s policy/policy_tests.pl -g run_tests -t halt
 ```
@@ -25,12 +28,15 @@ For local validation, provide your own JSON request and a local principal policy
 
 The shipped `config/principals.json` is empty: no permissions are granted by default. The CLI is an owner-operated local tool. `requestor` is an identity assertion by that owner, not network authentication. Do not expose it as a service. See [request contract](docs/contracts.md). SQLite evidence is created under ignored `data/`; treat it as sensitive.
 
+`demo` and `run` require a valid paid execution entitlement as well as principal policy. Missing licensing authority is an expected denial in a fresh checkout. Build and tests require no entitlement; settlement test records are labeled development fixtures.
+
 ## Included
 
 | Component | Behavior | Status |
 | --- | --- | --- |
 | COBOL control gate and shared copybooks | Validate input, allowlisted dispatch, halt without broker, guard completion | Source; compiler unavailable locally |
-| Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document inspection | Runnable; 16 control tests |
+| Rust validation harness | Deterministic minimum set, exact journal checks, exact migration comparison, document inspection | 17 control tests; licensed execution |
+| Rust entitlement gate | Ed25519 paid claims, AES-256-GCM, deployment binding, Windows DPAPI | Tested; production issuer unconfigured |
 | REXX launcher | Fixed build/test/run actions; arbitrary commands rejected | Tested on Windows and in CI |
 | SQLite audit/provenance store | Atomic commit, replay checks, graph freezes, restart chain verification | Runnable and tested |
 | Prolog policy | Minimum permitted capability cover; integer balance and exact term checks | Runnable policy tests |
@@ -55,5 +61,5 @@ build/smoke
 
 Create `build/` first. The smoke program prints a single PASS marker only after invalid identity and missing-broker rejection both succeed; CI verifies that marker. Strict COBOL-85 returns status through the result area and uses EXIT PROGRAM, without a process RETURN-CODE register. No broker implementation is linked. IBM COBOL II acceptance and binary interoperability must be verified on the target compiler. Do not treat the original JVM sketch, procedure-pointer declarations, or UUID function as verified COBOL-85 features. The ABI must specify compiler, code page, numeric storage and calling convention; copybook names alone do not establish interoperability.
 
-See [architecture](docs/architecture.md), [design corrections](docs/design-review.md), and [delivery roadmap](docs/roadmap.md). The project is hosted privately; no license for the original David code has been selected. The Codex submodule retains its upstream Apache-2.0 license and notices.
+See [architecture](docs/architecture.md), [design corrections](docs/design-review.md), and [delivery roadmap](docs/roadmap.md). The project is hosted privately under the supplied SnapKitty license. The Codex submodule retains its upstream Apache-2.0 license and notices.
 See [Codex/Qwen integration](docs/codex-qwen.md) for the upstream Rust harness, local endpoint, launch commands and transport limits.

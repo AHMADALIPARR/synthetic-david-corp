@@ -9,3 +9,7 @@ build/
 rust/target/
 vendor/codex/
 .codex-local/
+.licensing/
+*.key
+*.entitlement
+*.signed-entitlement.json

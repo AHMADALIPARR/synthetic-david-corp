@@ -23,6 +23,7 @@ fn error(request: Request, status: u16, code: &str) {
     );
 }
 fn infer(client: &Client, prepared: &david_qwen_endpoint::Prepared) -> Result<Value, &'static str> {
+    david_execution_gate::authorize("qwen.responses")?;
     let mut request = client.post(UPSTREAM).json(&prepared.body);
     if let Ok(key) = std::env::var("LM_STUDIO_API_KEY") {
         request = request.bearer_auth(key);
@@ -39,6 +40,7 @@ fn infer(client: &Client, prepared: &david_qwen_endpoint::Prepared) -> Result<Va
     if bytes.len() > 2_097_152 {
         return Err("UPSTREAM_RESPONSE_TOO_LARGE");
     }
+    david_execution_gate::authorize("qwen.responses")?;
     let response: Value = serde_json::from_slice(&bytes).map_err(|_| "UPSTREAM_INVALID_JSON")?;
     let mut response = restore(response, &prepared.custom_tools)?;
     restore_namespaces(&mut response, &prepared.namespaces);
@@ -59,7 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
         match (request.method(), request.url()) {
             (&Method::Get, "/health") => {
-                send(request,200,"application/json",json!({"service":"david-qwen-endpoint","pid":std::process::id(),"model":MODEL,"upstreamVerified":false,"bufferedSse":true}).to_string());
+                send(request,200,"application/json",json!({"service":"david-qwen-endpoint","pid":std::process::id(),"model":MODEL,"upstreamVerified":false,"bufferedSse":true,"license":david_execution_gate::status("qwen.responses")}).to_string());
                 continue;
             }
             (&Method::Get, "/v1/models") => {
@@ -71,6 +73,10 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                 error(request, 404, "UNKNOWN_ENDPOINT");
                 continue;
             }
+        }
+        if let Err(code) = david_execution_gate::authorize("qwen.responses") {
+            error(request, 403, code);
+            continue;
         }
         if request
             .headers()
@@ -120,7 +126,15 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                 Err(code) => error(request, 502, code),
             },
             Ok(response) => send(request, 200, "application/json", response.to_string()),
-            Err(code) => error(request, 502, code),
+            Err(code) => error(
+                request,
+                if code.starts_with("LICENSE_") {
+                    403
+                } else {
+                    502
+                },
+                code,
+            ),
         }
     }
     Ok(())

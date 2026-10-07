@@ -77,6 +77,7 @@ fn start() -> Result<Value, Box<dyn std::error::Error>> {
     Err("Adapter failed to start; inspect data/qwen-adapter-error.log".into())
 }
 fn codex(prompt: &[String]) -> Result<i32, Box<dyn std::error::Error>> {
+    david_execution_gate::authorize("codex.launch")?;
     health()?;
     let root = root();
     let state = root.join(".codex-local");
@@ -240,7 +241,7 @@ fn publication() -> Result<Value, Box<dyn std::error::Error>> {
         return Err("git ls-files failed".into());
     }
     let sensitive = regex::Regex::new(
-        r"(?i)(^|/)(\.env(\..*)?|\.tools|\.codex-local|node_modules|target|data|build)(/|$)|\.(log|db|sqlite.*|exe|dll|gguf|bin|mjs|js|ts|ps1)$",
+        r"(?i)(^|/)(\.env(\..*)?|\.tools|\.codex-local|\.licensing|node_modules|target|data|build)(/|$)|\.(log|db|sqlite.*|exe|dll|gguf|bin|mjs|js|ts|ps1|key|entitlement|signed-entitlement\.json)$",
     )?;
     let secrets = regex::Regex::new(
         r"\b(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|sk-(proj-|ant-)?[A-Za-z0-9_-]{40,})|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----",
@@ -290,7 +291,16 @@ fn main() {
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     let value = match args.first().map(String::as_str).unwrap_or("help") {
-        "demo" => execute(&Store::open(":memory:")?, &demo_policy(), &demo_request()),
+        "demo" => {
+            let response = execute(&Store::open(":memory:")?, &demo_policy(), &demo_request());
+            println!("{}", serde_json::to_string_pretty(&response)?);
+            if response["status"] != "COMPLETED" {
+                std::process::exit(1);
+            }
+            return Ok(());
+        }
+        "license-status" => david_execution_gate::status("corporate.validation"),
+        "deployment-id" => json!({"deploymentSha256":david_execution_gate::deployment_id()?}),
         "run" => {
             let request = read(
                 args.get(1)
@@ -332,7 +342,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         "codex" => std::process::exit(codex(&args[1..])?),
         "help" => {
             println!(
-                "david demo | run REQUEST [POLICY] [DB] | audit [DB] | qwen-start | qwen-status | qwen-verify | codex [PROMPT] | publication-check"
+                "david demo | run REQUEST [POLICY] [DB] | audit [DB] | license-status | deployment-id | qwen-start | qwen-status | qwen-verify | codex [PROMPT] | publication-check"
             );
             return Ok(());
         }

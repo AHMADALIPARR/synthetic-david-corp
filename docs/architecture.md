@@ -14,6 +14,8 @@ The diagram describes the working Rust validation harness. The COBOL control gat
 
 Project-owned execution uses COBOL, Rust and Prolog. REXX is the sole script glue and accepts fixed actions only. Codex is launched as a native executable; the Qwen adapter and launcher contain no JavaScript runtime dependency. Rails and Haskell files remain optional integration/design sources from the original language family.
 
+An embedded `david-execution-gate` verifies issuer-signed payment-backed entitlements, AES-256-GCM authentication, deployment identity and validity before protected execution. License authorization remains separate from principal permissions and banking authority. The shipped signing root is empty and fails closed. See [execution entitlements](execution-entitlements.md) for provisioning and anti-clone limits.
+
 Only three read-only adapters exist. There is no shell execution, HTTP endpoint dispatch, GPU embedding requirement, bank credentials, or LLM dependency. Future vector/model candidates are hints intersected with trusted capabilities and grants. The registry is immutable in-process; unknown agents are rejected, not dropped.
 
 Audit events chain over canonical event bytes including previous hash. They bind provenance content by hash. SQL triggers prevent application-level updates/deletes. Transaction rollback prevents evidence without audit. Startup and each request verify the stored chain, and restart continues from its head.
