@@ -26,5 +26,6 @@ jobs:
       - run: sudo apt-get install -y gnucobol swi-prolog
       - run: mkdir -p build
       - run: cobc -std=cobol85 -fixed -I cobol/copybooks -x -o build/smoke cobol/smoke.cbl cobol/synthetic-david-corp.cbl
-      - run: build/smoke
+      - run: build/smoke | tee build/smoke.log
+      - run: grep -qx 'PASS: MISSING ID AND MISSING BROKER FAIL CLOSED' build/smoke.log
       - run: swipl -q -s policy/policy_tests.pl -g run_tests -t halt

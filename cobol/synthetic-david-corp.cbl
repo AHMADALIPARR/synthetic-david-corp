@@ -71,12 +71,7 @@
                END-IF
            END-IF
            MOVE WS-STATE TO SD-RESULT-STATUS
-           IF WS-STATE = 'COMPLETED'
-               MOVE ZERO TO RETURN-CODE
-           ELSE
-               MOVE 16 TO RETURN-CODE
-           END-IF
-           GOBACK.
+           EXIT PROGRAM.
        CALL-BROKER.
            MOVE ZERO TO WS-BROKER-RC
            CALL 'SD-BROKER' USING WS-COMMAND SD-REQUEST

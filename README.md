@@ -50,7 +50,7 @@ cobc -std=cobol85 -fixed -I cobol/copybooks -x -o build/smoke cobol/smoke.cbl co
 build/smoke
 ```
 
-Create `build/` first. This exercises invalid identity and missing-broker rejection. No broker implementation is linked. IBM COBOL II acceptance and binary interoperability must be verified on the target compiler. Do not treat the original JVM sketch, procedure-pointer declarations, or UUID function as verified COBOL-85 features. The ABI must specify compiler, code page, numeric storage and calling convention; copybook names alone do not establish interoperability.
+Create `build/` first. The smoke program prints a single PASS marker only after invalid identity and missing-broker rejection both succeed; CI verifies that marker. Strict COBOL-85 returns status through the result area and uses EXIT PROGRAM, without a process RETURN-CODE register. No broker implementation is linked. IBM COBOL II acceptance and binary interoperability must be verified on the target compiler. Do not treat the original JVM sketch, procedure-pointer declarations, or UUID function as verified COBOL-85 features. The ABI must specify compiler, code page, numeric storage and calling convention; copybook names alone do not establish interoperability.
 
 See [architecture](docs/architecture.md), [design corrections](docs/design-review.md), and [delivery roadmap](docs/roadmap.md). The project is hosted privately; no license for the original David code has been selected. The Codex submodule retains its upstream Apache-2.0 license and notices.
 See [Codex/Qwen integration](docs/codex-qwen.md) for the upstream Rust harness, local endpoint, launch commands and transport limits.
